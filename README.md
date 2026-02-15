@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TaskBoard
 
-## Getting Started
+A Kanban board built with **Next.js 16**, **React 19**, **Tailwind CSS v4**, **Shadcn/UI**, **Zustand**, **Framer Motion**, and **@dnd-kit**.  
+All data is persisted client-side via `localStorage`.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Kanban Board** — Three columns (To Do · In Progress · Done) with drag-and-drop.
+- **Task Management** — create, edit, delete tasks with title, description, priority, due date, and tags
+- **Drag & Drop** — Reorder tasks within a column or move them across columns.
+- **Activity Log** — Automatic tracking of every task (created, moved, edited, deleted) with timestamps
+- **Authentication** — Login with "Remember Me" support persisted to localStorage
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Next.js
+| React
+| Tailwind CSS
+| Shadcn/UI
+| Zustand
+| Zod
+| react-hook-form
+| @dnd-kit
+| Framer Motion
+| date-fns
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+### Installation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Install dependencies**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   npm install
+   ```
 
-## Deploy on Vercel
+2. **Start the development server**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   ```bash
+   npm run dev
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. **Open the app**
+
+   Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## Login Credentials
+
+| Field | Value |
+|---|---|
+| **Email** | `intern@demo.com` |
+| **Password** | `intern123` |
+
+---
+
+## Architecture Overview
+
+### Routing
+
+| Route | Access | Description |
+|---|---|---|
+| `/` | Public | Auto-redirects to `/board` or `/login` based on auth state |
+| `/login` | Public | Login form; redirects to `/board` if already authenticated |
+| `/board` | Protected | Kanban board wrapped in `<AuthGuard>` |
+
+### State Management
+
+A single **Zustand** store (`lib/store.ts`) manages the entire app state:
+
+- **Auth state** — `isAuthenticated`, `rememberMe`, `login()`, `logout()`
+- **Tasks** — `tasks[]`, `addTask()`, `updateTask()`, `deleteTask()`, `moveTask()`, `reorderTask()`
+- **Activity Log** — `activityLog[]`, `clearLog()`
+- **Filters** — `searchQuery`, `priorityFilter`, `sortDirection` 
+
+**Persistence**: The store uses Zustand's `persist` middleware with `localStorage` (key: `"taskboard-storage"`). Tasks and activity logs are always persisted; auth state is persisted only when "Remember Me" is checked.
+
+### Drag & Drop
+
+Built with `@dnd-kit`:
+- `<DndContext>` in `board-view.tsx` manages the drag session
+- Each column uses `useDroppable` with `<SortableContext>`
+- Moving between columns logs a "moved" activity entry
+
+---
+
+## localStorage
+
+All app data is stored under the `"taskboard-storage"` key in your browser's localStorage. You can inspect it in DevTools:
+
+To **reset all data**, use the "Reset" button in the app header
