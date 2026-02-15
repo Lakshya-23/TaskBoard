@@ -8,14 +8,14 @@ export default function Home() {
   const router = useRouter();
   const isAuthenticated = useBoardStore((s) => s.isAuthenticated);
   const [hydrated, setHydrated] = useState(
-    () => useBoardStore.persist.hasHydrated()
+    () => useBoardStore.persist?.hasHydrated() ?? false
   );
 
   useEffect(() => {
-    const unsub = useBoardStore.persist.onFinishHydration(() => {
+    const unsub = useBoardStore.persist?.onFinishHydration(() => {
       setHydrated(true);
     });
-    return () => unsub();
+    return () => unsub?.();
   }, []);
 
   useEffect(() => {
